@@ -1,7 +1,5 @@
 import pymysql
 
-import pymysql
-
 def stream_users():
     """
     Generator that connects to the ALX_prodev MySQL database
