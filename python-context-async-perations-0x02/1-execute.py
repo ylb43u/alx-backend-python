@@ -22,3 +22,7 @@ class ExecuteQuery:
         self.conn.close()
         # Returning False propagates exception if any
         return False    
+
+with ExecuteQuery() as results:
+    for row in results:
+        print(row)
