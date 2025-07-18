@@ -7,11 +7,12 @@ from parameterized import parameterized
 from client import GithubOrgClient  # adjust import based on your project structure
 
 
-class TestGithubOrgClient(unittest.TestCase):
-   
+class TestGithubOrgClient(unittest.TestCase):   
+    """Unit tests for GithubOrgClient.has_license method."""
+
     @parameterized.expand([
-        ("google",),
-        ("abc",),
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False),
     ])
     
     @patch("client.get_json")
@@ -54,4 +55,14 @@ class TestGithubOrgClient(unittest.TestCase):
             
             mock_get_json.assert_called_once_with(f"https://api.github.com/orgs/google/repos")
             mock_public_repo.assert_called_once()
-  
+    def test_has_license(self,repo,license_key,expected):
+        """Test that has_license correctly returns True or False.
+
+        Args:
+            repo (_type_): _description_
+            license_key (_type_): _description_
+            expected (_type_): _description_
+        """
+        result = GithubOrgClient("repo").has_license(repo,license_key)
+        
+        self.assertEqual(result,expected)
