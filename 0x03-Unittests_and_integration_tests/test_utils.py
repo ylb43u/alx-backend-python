@@ -3,8 +3,9 @@
 import unittest
 import requests
 from parameterized import parameterized
-from typing import Mapping, Sequence, Any, Dict
+from typing import Mapping, Sequence, Any, Dict, Callable
 from unittest.mock import patch, Mock
+from functools import wraps
 
 
 def access_nested_map(nested_map: Mapping, path: Sequence) -> Any:
@@ -60,3 +61,35 @@ class TestGetJson(unittest.TestCase):
         mock_get.assert_called_once_with(test_url)
         
         self.assertEqual(result, test_payload)
+ 
+class TestMemoize(unittest.TestCase):       
+    
+    def test_memoize(self):
+        def memoize(fn:Callable)->Callable:
+            attr_name = "_{}".format(fn.__name__)
+            
+            @wraps(fn)
+            def memoized(self):
+                if not hasattr(self, attr_name):
+                    setattr(self, attr_name, fn(self))
+                return getattr(self, attr_name)
+            return property(memoized)
+        
+        class TestClass:
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+        with object.patch(TestClass,'a_method',return_value=42) as mock_method:
+            obj = TestClass()
+            result1 = obj.a_property
+            
+            result2 = obj.a_property
+            
+            self.assertEqual(result1,42)
+            self.assertEqual(result2,42)
+            
+            mock_method.assert_called_once()  # ✅ Confirm a_method was called only once
+            

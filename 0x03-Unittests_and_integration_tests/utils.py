@@ -74,4 +74,3 @@ def memoize(fn: Callable) -> Callable:
 
     return property(memoized)
 
-
