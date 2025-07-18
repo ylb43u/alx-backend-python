@@ -66,3 +66,45 @@ class TestGithubOrgClient(unittest.TestCase):
         result = GithubOrgClient("repo").has_license(repo,license_key)
         
         self.assertEqual(result,expected)
+        
+from fixtures import org_payload, repos_payload, expected_repos, apache2_repos        
+from parameterized import parameterized_class
+from unittest.mock import Mock
+
+@parameterized_class([
+    {
+        "org_payload": org_payload,
+        "repos_payload": repos_payload,
+        "expected_repos": expected_repos,
+        "apache2_repos": apache2_repos
+    }
+])
+
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """Integration tests for GithubOrgClient with fixtures."""
+    
+    @classmethod
+    def setUpClass(cls):
+        """Set up mock for requests.get with side_effects."""
+        cls.get_patcher = patch("requests.get")
+        mock_get = cls.get_patcher.start()
+
+        # Define side_effect behavior for multiple URLs
+        def side_effect(url):
+            mock_resp = Mock()
+            if url.endswith("/orgs/google"):
+                mock_resp.json.return_value = cls.org_payload
+            elif url.endswith("/orgs/google/repos"):
+                mock_resp.json.return_value = cls.repos_payload
+            return mock_resp
+
+        mock_get.side_effect = side_effect
+
+    @classmethod
+    def tearDownClass(cls):
+        """Stop the patcher."""
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        client = GithubOrgClient("google")
+        self.assertEqual(client.public_repos(), self.expected_repos)
