@@ -1,5 +1,6 @@
 # chats/views.py
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status,filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
@@ -9,6 +10,11 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = ['participants__username']
+    filterset_fields = ['participants']  # you can filter conversations by participant
+    
+    
     def create(self, request, *args, **kwargs):
         # Expect participants list of user_ids in request.data
         participants_ids = request.data.get('participants', [])
@@ -38,6 +44,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['conversation']  # filter messages by conversation ID
+    
     def create(self, request, *args, **kwargs):
         sender = request.user
 
