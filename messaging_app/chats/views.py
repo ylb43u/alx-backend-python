@@ -9,7 +9,7 @@ from .permissions import IsParticipantOfConversation,IsMessageParticipant
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [permissions.IsAuthenticated, IsParticipantOfConversation]
+    permission_classes = [IsParticipantOfConversation]
 
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['participants__username']
@@ -43,7 +43,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated, IsMessageParticipant]
+    permission_classes = [IsMessageParticipant]
 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['conversation']  # filter messages by conversation ID

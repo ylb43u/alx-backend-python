@@ -9,6 +9,9 @@ class IsParticipantOfConversation(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # obj is a Conversation instance
+        if not request.user or not request.user.is_authenticated:
+            return False
+        
         return request.user in obj.participants.all()
 
 
@@ -19,4 +22,7 @@ class IsMessageParticipant(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # obj is a Message instance
+        if not request.user or not request.user.is_authenticated:
+            return False
+        
         return request.user in obj.conversation.participants.all()
