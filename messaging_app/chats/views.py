@@ -8,7 +8,7 @@ from .permissions import IsParticipantOfConversation,IsMessageParticipant
 from rest_framework.status import HTTP_403_FORBIDDEN
 from rest_framework.response import Response
 from .filters import MessageFilter
-from rest_framework.pagination import PageNumberPagination
+from .pagination import MessagePagination
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
@@ -47,9 +47,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
         return Message.objects.filter(conversation__participants=self.request.user)
     
 
-class MessagePagination(PageNumberPagination):
-    page_size = 20
-    
+
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
