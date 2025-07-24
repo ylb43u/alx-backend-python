@@ -12,7 +12,11 @@ class IsParticipantOfConversation(permissions.BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
         
-        return request.user in obj.participants.all()
+         # Allow GET, POST, PUT, PATCH, DELETE only for participants
+        if request.method in ["GET", "POST", "PUT", "PATCH", "DELETE"]:
+            return request.user in obj.participants.all()
+
+        return False
 
 
 class IsMessageParticipant(permissions.BasePermission):
@@ -25,4 +29,8 @@ class IsMessageParticipant(permissions.BasePermission):
         if not request.user or not request.user.is_authenticated:
             return False
         
-        return request.user in obj.conversation.participants.all()
+         # Allow GET, POST, PUT, PATCH, DELETE only for participants
+        if request.method in ["GET", "POST", "PUT", "PATCH", "DELETE"]:
+            return request.user in obj.conversation.participants.all()
+
+        return False
