@@ -3,7 +3,7 @@ from rest_framework import viewsets, permissions, status,filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from .models import Conversation, Message, User
-from .serializers import ConversationSerializer, MessageSerializer
+from .serializers import ConversationSerializer, MessageSerializer, UserSerializer
 from .permissions import IsParticipantOfConversation,IsMessageParticipant
 from rest_framework.status import HTTP_403_FORBIDDEN
 from rest_framework.response import Response
@@ -22,7 +22,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         # Expect participants list of user_ids in request.data
-        participants_ids = request.data.get('participants', [])
+        participants_ids = request.data.get('participant_ids', [])
 
         if not participants_ids or not isinstance(participants_ids, list):
             return Response({"error": "Participants must be a non-empty list of user IDs."},
@@ -92,3 +92,8 @@ class MessageViewSet(viewsets.ModelViewSet):
         if request.user not in instance.conversation.participants.all():
             return Response({"detail": "You are not a participant of this conversation."}, status=HTTP_403_FORBIDDEN)
         return super().destroy(request, *args, **kwargs)
+    
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]

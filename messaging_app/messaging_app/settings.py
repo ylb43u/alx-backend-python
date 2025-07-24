@@ -37,9 +37,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'rest_framework',
+    'rest_framework',    
     'rest_framework_simplejwt',
-    'django_filters',
+    'django_filters',    
     'chats',
 ]
 
@@ -145,3 +145,8 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+SIMPLE_JWT = {
+    "USER_ID_FIELD": "user_id",  # 👈 use your custom PK name
+    "USER_ID_CLAIM": "user_id",  # 👈 optional: makes claim name match field
+}
