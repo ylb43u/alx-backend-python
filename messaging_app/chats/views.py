@@ -4,11 +4,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from .models import Conversation, Message, User
 from .serializers import ConversationSerializer, MessageSerializer
+from .permissions import IsConversationParticipant,IsMessageParticipant
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsConversationParticipant]
 
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['participants__username']
@@ -42,7 +43,7 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsMessageParticipant]
 
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['conversation']  # filter messages by conversation ID
