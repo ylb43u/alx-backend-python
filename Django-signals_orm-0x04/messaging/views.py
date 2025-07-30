@@ -17,13 +17,31 @@ class delete_user(viewsets.ModelViewSet):
 
 class ThreadedConversationView(viewsets.views):
     def get(self,request,message_id):
-        root_message = Message.objects.filter(message_id=message_id).select_related('sender','receiver').prefetch_related(
+        root_qs = Message.objects.filter(
+                message_id=message_id,
+                sender=request.user
+            ).select_related('sender','receiver').prefetch_related(
                 Prefetch('replies',queryset=Message.objects.select_related('sender','receiver'))
             )
-        
-        return Response.json({
-            'root_message':root_message,
-            'replies':self.get_all_replies(root_message)
+                    
+        if not root_qs.exists():
+                        return Response({'error': 'Message not found or access denied'}, status=404)
+
+        root_message = root_qs.first()
+
+        # Step 2: Build threaded replies
+        replies = self.get_all_replies(root_message)
+
+        # Step 3: Return data
+        return Response({
+            'root_message': {
+                'id': str(root_message.message_id),
+                'sender': root_message.sender.username,
+                'receiver': root_message.receiver.username,
+                'content': root_message.content,
+                'timestamp': root_message.sent_at
+            },
+            'replies': replies
         })
         
     def get_all_replies(self, message):
