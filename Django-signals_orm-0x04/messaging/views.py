@@ -59,7 +59,7 @@ class UnreadInboxView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        unread_messages = Message.unread.for_user(request.user)
+        unread_messages = Message.unread.unread_for_user(request.user)
 
         data = [
             {
