@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status, permissions, viewsets
 from django.contrib.auth.models import User
 
-class DeleteUserView(viewsets.ModelViewSet):
+class delete_user(viewsets.ModelViewSet):
     
     permission_classes = [permissions.IsAuthenticated]
     
