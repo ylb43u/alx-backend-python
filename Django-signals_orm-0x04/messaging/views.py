@@ -16,10 +16,10 @@ class delete_user(viewsets.ModelViewSet):
         return Response({"message": "User account deleted."}, status=status.HTTP_204_NO_CONTENT)
 
 class ThreadedConversationView(viewsets.views):
-    def get(self,request):
-        root_message = Message.objects.select_related('sender','receiver').prefetch_related(
+    def get(self,request,message_id):
+        root_message = Message.objects.filter(message_id=message_id).select_related('sender','receiver').prefetch_related(
                 Prefetch('replies',queryset=Message.objects.select_related('sender','receiver'))
-            ).filter(sender=request.user)
+            )
         
         return Response.json({
             'root_message':root_message,
