@@ -17,9 +17,10 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from .messaging.views import delete_user
+from .messaging.views import delete_user, ThreadedConversationView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/delete-user/', delete_user.as_view(), name='delete_user'),
+    path('thread/<uuid:message_id>/', ThreadedConversationView.as_view(), name='threaded_conversation'),
 ]
