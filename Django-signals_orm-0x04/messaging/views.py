@@ -54,3 +54,21 @@ class ThreadedConversationView(viewsets.views):
                 
         _collect_replies(message)
         return replies
+    
+class UnreadInboxView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        unread_messages = Message.unread.for_user(request.user)
+
+        data = [
+            {
+                'id': msg.id,
+                'sender': msg.sender.username,
+                'content': msg.content,
+                'sent_at': msg.sent_at
+            }
+            for msg in unread_messages
+        ]
+
+        return Response({'unread_messages': data})
