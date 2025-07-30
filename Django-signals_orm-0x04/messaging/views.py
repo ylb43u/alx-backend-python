@@ -2,9 +2,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions, viewsets
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from .models import Message
 from django.db.models import Prefetch
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 class delete_user(viewsets.ModelViewSet):
     
@@ -74,3 +75,20 @@ class UnreadInboxView(APIView):
         ]
 
         return Response({'unread_messages': data})
+    
+    
+@method_decorator(cache_page(60), name='list')
+class ConversationMessagesView(viewsets.ViewSet):
+    def list(self, request):
+        user = request.user
+        messages = Message.objects.filter(receiver=user)
+        data = [
+            {
+                "id": msg.id,
+                "content": msg.content,
+                "sender": msg.sender.username,
+                "timestamp": msg.timestamp
+            }
+            for msg in messages
+        ]
+        return Response(data)
