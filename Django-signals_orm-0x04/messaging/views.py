@@ -1,13 +1,16 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, permissions, viewsets
+from rest_framework.decorators import api_view
+from rest_framework import status, permissions, generics
 from django.contrib.auth.models import User
 from .models import Message
 from django.db.models import Prefetch
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.shortcuts import get_object_or_404
+from .serializers import MessageSerializer
 
-class delete_user(viewsets.ModelViewSet):
+class delete_user(generics.DestroyAPIView):
     
     permission_classes = [permissions.IsAuthenticated]
     
@@ -16,7 +19,7 @@ class delete_user(viewsets.ModelViewSet):
         user.delete()
         return Response({"message": "User account deleted."}, status=status.HTTP_204_NO_CONTENT)
 
-class ThreadedConversationView(viewsets.views):
+class ThreadedConversationView(generics.GenericAPIView):
     def get(self,request,message_id):
         root_qs = Message.objects.filter(
                 message_id=message_id,
@@ -78,17 +81,18 @@ class UnreadInboxView(APIView):
     
     
 @method_decorator(cache_page(60), name='list')
-class ConversationMessagesView(viewsets.ViewSet):
-    def list(self, request):
-        user = request.user
-        messages = Message.objects.filter(receiver=user)
-        data = [
-            {
-                "id": msg.id,
-                "content": msg.content,
-                "sender": msg.sender.username,
-                "timestamp": msg.timestamp
-            }
-            for msg in messages
-        ]
-        return Response(data)
+class ConversationMessagesView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = MessageSerializer  # you need a serializer
+    def get_queryset(self):
+        user = self.request.user
+        return Message.objects.filter(receiver=user)
+    
+@api_view(['GET'])    
+def retreive_message_history(request,message_id):
+    message = get_object_or_404(Message,message_id=message_id)
+    history = message.history.all().order_by('-edited_at')
+    return Response({
+         'message': message.content,
+         'history': [{'content': hist.content} for hist in history]
+    })

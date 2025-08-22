@@ -19,10 +19,19 @@ class Message(models.Model):
     
     objects = models.Manager()  # default manager
     unread = UnreadMessagesManager()  # custom manager
+    edited = models.BooleanField(default=False)
 
 def __str__(self):
         return f"{self.sender} ➝ {self.receiver} ({'Reply' if self.parent_message else 'Message'})"
     
+class MessageHistory(models.Model):
+    content = models.TextField()
+    message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="history")
+    edited_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"History of {self.message.message_id} at {self.edited_at}"
+
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name="notifications")
