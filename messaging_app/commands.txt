@@ -1,0 +1,11 @@
+# Enable ingress controller in Minikube
+minikube addons enable ingress
+
+# Apply the Ingress configuration
+kubectl apply -f ingress.yaml
+
+# Verify ingress resource is created
+kubectl get ingress
+
+# (Optional) Run minikube tunnel to expose ingress controller
+minikube tunnel

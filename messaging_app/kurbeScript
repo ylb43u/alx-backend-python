@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e  # Exit immediately if a command fails
+
+echo "=== Starting Minikube Kubernetes cluster ==="
+minikube start
+
+echo "=== Checking cluster info ==="
+kubectl cluster-info
+
+echo "=== Checking nodes ==="
+kubectl get nodes
+
+echo "=== Checking pods in all namespaces ==="
+kubectl get pods --all-namespaces
