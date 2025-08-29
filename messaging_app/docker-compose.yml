@@ -12,7 +12,7 @@ services:
         source: .
         target: /app
     environment:
-      -MYSQL_DATABASE=messaging_db
+      -MYSQL_DB=messaging_db
       -MYSQL_USER=messaging_user
       -MYSQL_PASSWORD=toor
       -MYSQL_ROOT_PASSWORD=toor
@@ -33,7 +33,7 @@ services:
     container_name: messaging_db
     restart: unless-stopped
     environment:
-      -MYSQL_DATABASE=messaging_db
+      -MYSQL_DB=messaging_db
       -MYSQL_USER=messaging_user
       -MYSQL_PASSWORD=toor
       -MYSQL_ROOT_PASSWORD=toor  
