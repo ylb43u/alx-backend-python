@@ -18,3 +18,6 @@ EXPOSE 8000
 
 # Run the application (update if your entrypoint is different)
 CMD ["python", "./manage.py", "runserver"]
+
+#docker build -t messaging-app .
+#docker run -p 8000:8000 messaging-app
