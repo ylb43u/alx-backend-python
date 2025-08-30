@@ -42,9 +42,8 @@ pipeline {
                 sh '''
                     cd messaging_app
                     . venv/bin/activate
-                    docker build -t messaging-app .
-                    docker run -d -p 5000:5000 --name messaging-app messaging-app
-                    echo "Application is running on http://localhost:5000"
+                    python3 manage.py runserver 0.0.0.0:4000
+                    echo "Application is running on http://localhost:4000"
                 '''
             }
         }

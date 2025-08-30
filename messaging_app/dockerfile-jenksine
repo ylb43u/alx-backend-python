@@ -1,0 +1,13 @@
+# Use the official Jenkins LTS image as base
+FROM jenkins/jenkins:lts
+
+# Switch to root to install packages
+USER root
+
+# Update apt and install Python, pip, venv, git
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip python3-venv docker.io git && \
+    apt-get clean
+
+# Switch back to Jenkins user
+USER jenkins
