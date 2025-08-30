@@ -1,18 +1,17 @@
 pipeline {
     agent any
 
-
     stages {
         stage('Checkout Code') {
             steps {
+                // No credentials needed for public repo
                 git branch: 'master',
-                    url: 'https://github.com/ylb43u/alx-backend-python.git',
+                    url: 'https://github.com/ylb43u/alx-backend-python.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Create virtual environment (optional but recommended)
                 sh '''
                     cd messaging_app
                     python3 -m venv venv
@@ -33,7 +32,7 @@ pipeline {
             }
             post {
                 always {
-                    junit 'report.xml'  // Publish test results
+                    junit 'messaging_app/report.xml'  // Publish test results
                 }
             }
         }
