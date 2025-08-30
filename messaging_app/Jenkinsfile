@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    environment {
+        // Use the credentials ID you created in Jenkins
+        GITHUB_CREDENTIALS = 'github-creds'
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/ylb43u/alx-backend-python/tree/master/messaging_app',
+                    credentialsId: "${GITHUB_CREDENTIALS}"
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Create virtual environment (optional but recommended)
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh '''
+                    . venv/bin/activate
+                    pytest --junitxml=report.xml
+                '''
+            }
+            post {
+                always {
+                    junit 'report.xml'  // Publish test results
+                }
+            }
+        }
+    }
+}
