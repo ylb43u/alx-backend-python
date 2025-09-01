@@ -42,15 +42,16 @@ pipeline {
         //     }
         // }
 
-        stage('Build Application') {
-            steps {
-                sh '''
-                    cd messaging_app
-                    . venv/bin/activate
-                    python3 manage.py runserver 0.0.0.0:4000
-                    echo "Application is running on http://localhost:4000"
-                '''
-            }
-        }
+      stage('Build Application') {
+    steps {
+        sh '''
+            cd messaging_app
+            . venv/bin/activate
+            python3 manage.py migrate --noinput
+            python3 manage.py test
+        '''
+    }
+}
+
     }
 }
