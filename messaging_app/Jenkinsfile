@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        MYSQL_DB = credentials('mysql_db')
+        MYSQL_USER = credentials('mysql_user')
+        MYSQL_PASSWORD = credentials('mysql_password')
+    }
     stages {
         stage('Checkout Code') {
             steps {
