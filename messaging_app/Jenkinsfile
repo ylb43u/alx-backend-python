@@ -6,52 +6,54 @@ pipeline {
         MYSQL_USER = credentials('mysql_user')
         MYSQL_PASSWORD = credentials('mysql_password')
     }
+
     stages {
         stage('Checkout Code') {
             steps {
-                // No credentials needed for public repo
                 git branch: 'master',
                     url: 'https://github.com/ylb43u/alx-backend-python.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Start Services') {
             steps {
                 sh '''
                     cd messaging_app
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
+                    docker compose up -d --build
                 '''
             }
         }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         sh '''
-        //             cd messaging_app
-        //             . venv/bin/activate
-        //             pytest --junitxml=report.xml
-        //         '''
-        //     }
-        //     post {
-        //         always {
-        //             junit 'messaging_app/report.xml'  // Publish test results
-        //         }
-        //     }
-        // }
+        stage('Migrate Database') {
+            steps {
+                sh '''
+                    cd messaging_app
+                    docker compose exec -T web python3 manage.py migrate --noinput
+                '''
+            }
+        }
 
-      stage('Build Application') {
-    steps {
-        sh '''
-            cd messaging_app
-            . venv/bin/activate
-            python3 manage.py migrate --noinput
-            python3 manage.py test
-        '''
+        stage('Run Tests') {
+            steps {
+                sh '''
+                    cd messaging_app
+                    docker compose exec -T web pytest --junitxml=report.xml
+                '''
+            }
+            post {
+                always {
+                    junit 'messaging_app/report.xml'
+                }
+            }
+        }
     }
-}
 
+    post {
+        always {
+            sh '''
+                cd messaging_app
+                docker compose down
+            '''
+        }
     }
 }
