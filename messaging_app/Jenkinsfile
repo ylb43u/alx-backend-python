@@ -19,7 +19,7 @@ pipeline {
             steps {
                 sh '''
                     cd messaging_app
-                    docker compose up -d --build
+                    docker-compose up -d --build
                 '''
             }
         }
@@ -28,7 +28,7 @@ pipeline {
             steps {
                 sh '''
                     cd messaging_app
-                    docker compose exec -T web python3 manage.py migrate --noinput
+                    docker-compose exec -T web python3 manage.py migrate --noinput
                 '''
             }
         }
